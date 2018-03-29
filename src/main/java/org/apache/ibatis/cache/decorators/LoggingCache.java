@@ -22,6 +22,7 @@ import org.apache.ibatis.logging.Log;
 import org.apache.ibatis.logging.LogFactory;
 
 /**
+ * 对缓存命中率添加日志
  * @author Clinton Begin
  */
 public class LoggingCache implements Cache {

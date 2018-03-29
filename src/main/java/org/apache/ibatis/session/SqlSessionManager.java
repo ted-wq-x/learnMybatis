@@ -35,8 +35,11 @@ import org.apache.ibatis.reflection.ExceptionUtil;
 public class SqlSessionManager implements SqlSessionFactory, SqlSession {
 
   private final SqlSessionFactory sqlSessionFactory;
+
+  // 代理类，主要是用于获取threadLocal中的sqlSession
   private final SqlSession sqlSessionProxy;
 
+  //sqlSession是和線程綁定的
   private final ThreadLocal<SqlSession> localSqlSession = new ThreadLocal<SqlSession>();
 
   private SqlSessionManager(SqlSessionFactory sqlSessionFactory) {
@@ -51,6 +54,12 @@ public class SqlSessionManager implements SqlSessionFactory, SqlSession {
     return new SqlSessionManager(new SqlSessionFactoryBuilder().build(reader, null, null));
   }
 
+  /**
+   *
+   * @param reader
+   * @param environment 多環境參數配置
+   * @return
+   */
   public static SqlSessionManager newInstance(Reader reader, String environment) {
     return new SqlSessionManager(new SqlSessionFactoryBuilder().build(reader, environment, null));
   }

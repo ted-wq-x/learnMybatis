@@ -100,8 +100,12 @@ public class ScriptRunner {
     this.fullLineDelimiter = fullLineDelimiter;
   }
 
+  /**
+   * 執行數據庫腳本
+   * @param reader
+   */
   public void runScript(Reader reader) {
-    setAutoCommit();
+    setAutoCommit();//設置connection為自動提交
 
     try {
       if (sendFullScript) {
@@ -117,6 +121,7 @@ public class ScriptRunner {
   private void executeFullScript(Reader reader) {
     StringBuilder script = new StringBuilder();
     try {
+      //讀取sql腳本
       BufferedReader lineReader = new BufferedReader(reader);
       String line;
       while ((line = lineReader.readLine()) != null) {
@@ -124,8 +129,11 @@ public class ScriptRunner {
         script.append(LINE_SEPARATOR);
       }
       String command = script.toString();
+      //日誌記錄sql
       println(command);
+      //執行sql
       executeStatement(command);
+      //事務提交
       commitConnection();
     } catch (Exception e) {
       String message = "Error executing: " + script + ".  Cause: " + e;

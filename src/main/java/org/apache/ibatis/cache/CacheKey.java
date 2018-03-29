@@ -22,6 +22,7 @@ import java.util.List;
 import org.apache.ibatis.reflection.ArrayUtil;
 
 /**
+ * 作为map的key，重写hashCode和toString方法
  * @author Clinton Begin
  */
 public class CacheKey implements Cloneable, Serializable {

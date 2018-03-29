@@ -58,7 +58,7 @@ public abstract class BaseDataTest {
   }
 
   public static void runScript(DataSource ds, String resource) throws IOException, SQLException {
-    Connection connection = ds.getConnection();
+    Connection connection = ds.getConnection();//獲取連接
     try {
       ScriptRunner runner = new ScriptRunner(connection);
       runner.setAutoCommit(true);
@@ -81,6 +81,7 @@ public abstract class BaseDataTest {
   }
 
   public static DataSource createBlogDataSource() throws IOException, SQLException {
+    //读取文件创建DataSource对象
     DataSource ds = createUnpooledDataSource(BLOG_PROPERTIES);
     runScript(ds, BLOG_DDL);
     runScript(ds, BLOG_DATA);
@@ -93,4 +94,7 @@ public abstract class BaseDataTest {
     runScript(ds, JPETSTORE_DATA);
     return ds;
   }
+
+
+
 }

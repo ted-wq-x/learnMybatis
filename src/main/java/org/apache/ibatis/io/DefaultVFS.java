@@ -54,6 +54,7 @@ public class DefaultVFS extends VFS {
   public List<String> list(URL url, String path) throws IOException {
     InputStream is = null;
     try {
+      //jar的名称
       List<String> resources = new ArrayList<String>();
 
       // First, try to find the URL of a JAR file containing the requested resource. If a JAR

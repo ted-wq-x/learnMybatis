@@ -27,6 +27,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 /**
+ * 对jdk中Node的包装
  * @author Clinton Begin
  */
 public class XNode {
@@ -51,6 +52,10 @@ public class XNode {
     return new XNode(xpathParser, node, variables);
   }
 
+  /**
+   * 获取父节点的xnode
+   * @return
+   */
   public XNode getParent() {
     Node parent = node.getParentNode();
     if (parent == null || !(parent instanceof Element)) {
@@ -60,6 +65,7 @@ public class XNode {
     }
   }
 
+  //取得完全的path (a/b/c)
   public String getPath() {
     StringBuilder builder = new StringBuilder();
     Node current = node;
@@ -73,6 +79,10 @@ public class XNode {
     return builder.toString();
   }
 
+  /**
+   * 返回值啥样，看test
+   * @return
+   */
   public String getValueBasedIdentifier() {
     StringBuilder builder = new StringBuilder();
     XNode current = this;

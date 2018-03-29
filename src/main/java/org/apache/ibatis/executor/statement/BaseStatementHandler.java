@@ -85,8 +85,12 @@ public abstract class BaseStatementHandler implements StatementHandler {
     ErrorContext.instance().sql(boundSql.getSql());
     Statement statement = null;
     try {
+      // 子类需要实现的方法，创建什么样的statement
       statement = instantiateStatement(connection);
+      //设置超时时间
       setStatementTimeout(statement, transactionTimeout);
+
+      // 想要取的条数
       setFetchSize(statement);
       return statement;
     } catch (SQLException e) {
@@ -98,8 +102,15 @@ public abstract class BaseStatementHandler implements StatementHandler {
     }
   }
 
+  //使用jdbc创建statement
   protected abstract Statement instantiateStatement(Connection connection) throws SQLException;
 
+  /**
+   * 设置超时时间
+   * @param stmt
+   * @param transactionTimeout
+   * @throws SQLException
+   */
   protected void setStatementTimeout(Statement stmt, Integer transactionTimeout) throws SQLException {
     Integer queryTimeout = null;
     if (mappedStatement.getTimeout() != null) {
@@ -113,6 +124,11 @@ public abstract class BaseStatementHandler implements StatementHandler {
     StatementUtil.applyTransactionTimeout(stmt, queryTimeout, transactionTimeout);
   }
 
+  /**
+   * 设置返回的条数
+   * @param stmt
+   * @throws SQLException
+   */
   protected void setFetchSize(Statement stmt) throws SQLException {
     Integer fetchSize = mappedStatement.getFetchSize();
     if (fetchSize != null) {

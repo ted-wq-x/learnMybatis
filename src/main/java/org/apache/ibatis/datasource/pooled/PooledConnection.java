@@ -24,6 +24,7 @@ import java.sql.SQLException;
 import org.apache.ibatis.reflection.ExceptionUtil;
 
 /**
+ * 包装了Connection
  * @author Clinton Begin
  */
 class PooledConnection implements InvocationHandler {
@@ -54,6 +55,7 @@ class PooledConnection implements InvocationHandler {
     this.createdTimestamp = System.currentTimeMillis();
     this.lastUsedTimestamp = System.currentTimeMillis();
     this.valid = true;
+    //初始化时，就通过反射将数据库连接放到池当中
     this.proxyConnection = (Connection) Proxy.newProxyInstance(Connection.class.getClassLoader(), IFACES, this);
   }
 
@@ -223,6 +225,7 @@ class PooledConnection implements InvocationHandler {
 
   /*
    * Required for InvocationHandler implementation.
+   * 使用反射调用pool中pushConnection，将当前连接放到池中
    *
    * @param proxy  - not used
    * @param method - the method to be executed

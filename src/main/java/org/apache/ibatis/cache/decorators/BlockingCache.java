@@ -38,7 +38,7 @@ public class BlockingCache implements Cache {
 
   private long timeout;
   private final Cache delegate;
-  private final ConcurrentHashMap<Object, ReentrantLock> locks;
+  private final ConcurrentHashMap<Object, ReentrantLock> locks;//存放的是key和锁
 
   public BlockingCache(Cache delegate) {
     this.delegate = delegate;
@@ -115,7 +115,7 @@ public class BlockingCache implements Cache {
   
   private void releaseLock(Object key) {
     ReentrantLock lock = locks.get(key);
-    if (lock.isHeldByCurrentThread()) {
+    if (lock.isHeldByCurrentThread()) {//判断锁是否被当前线程获取
       lock.unlock();
     }
   }

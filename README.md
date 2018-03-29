@@ -21,3 +21,81 @@ Essentials
 * [See the docs](http://mybatis.github.io/mybatis-3)
 * [Download Latest](https://github.com/mybatis/mybatis-3/releases)
 * [Download Snapshot](https://oss.sonatype.org/content/repositories/snapshots/org/mybatis/mybatis/)
+
+# 学习源码
+
+这个框架的本质是jdbc。
+
+版本：3.4.6-SNAPSHOT
+
+入口类：org.apache.ibatis.session.SqlSessionFactoryBuilder
+
+整体的架构图：
+
+![](http://img.blog.csdn.net/20141028140852531?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvbHVhbmxvdWlz/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast)
+
+## 进度
+
+- [x] DataSource：org.apache.ibatis.datasource
+- [x] Parsing：org.apache.ibatis.parsing
+- [x] Transaction：org.apache.ibatis.transaction
+- [x] cache：org.apache.ibatis.cache
+
+
+## 设计模式
+
+1. 工厂模式
+2. 建造者
+3. 装饰者：对于缓存的包装，所有包装器都是继承与Cache接口，并且构造器都含有Cache参数，当然这是装饰者模式的构造，在Mybatis中使用建造者模式构建cache（默认是lru）对象，并且有默认的装饰器
+4. 单例
+5. 代理
+6. 组合
+7. 模板方法
+8. 适配器
+9. 迭代器
+10. 责任链
+
+## 缓存机制
+
+之前一直很好奇，为什么PerpetualCache中使用的是hashmap，这怎么保证线程安全性？看了代码之后才知道，在创建cache的时候，都使用了SynchronizedCache
+进行了包装，所以是有的方法都是线程安全的。`CacheBuilder.setStandardDecorators()`
+
+## 重要组件介绍
+
+
+
+## 插件机制
+
+对于mybatis的插件机制起作用的几个地方是：
+
+* ParameterHandler
+* ResultSetHandler
+* StatementHandler
+* Executor
+
+在Configuration类当中都能够看到插件的调用。 
+
+## 查询流程介绍
+
+DefaultSqlSession-->Executor-->StatementHandler(ParameterHandler，ResultHandler，TypeHandler)
+
+其中StatementHandler是对sql语句进行预先处理的，ParameterHandler对参数进行处理，ResultHandler对结果进行处理，TypeHandler对数据库类型和java类型转换。
+
+StatementHandler的创建使用的是RoutingStatementHandler，该类是根据StatementType进行路由用的，简单工厂模式。
+
+
+### StatementHandler
+
+![](pic/StatementHandler.png)
+
+其中RoutingStatementHandler相当于是一个工厂，按照StatementType创建StatementHandler对象。
+而BaseStatementHandler下的结构则是模板方法模式：
+
+* SimpleStatementHandler：相当于是最基本的jdbc的方法调用，如Connection.createStatement().executeQuery()
+* PreparedStatementHandler：使用了预编译，如Connection.PrepareStatement()
+* CallableStatementHandler：执行存储过程的
+
+
+
+
+

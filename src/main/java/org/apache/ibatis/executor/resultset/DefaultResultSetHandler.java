@@ -188,6 +188,7 @@ public class DefaultResultSetHandler implements ResultSetHandler {
     int resultSetCount = 0;
     ResultSetWrapper rsw = getFirstResultSet(stmt);
 
+    //TODO
     List<ResultMap> resultMaps = mappedStatement.getResultMaps();
     int resultMapCount = resultMaps.size();
     validateResultMapsCount(rsw, resultMapCount);
@@ -235,6 +236,12 @@ public class DefaultResultSetHandler implements ResultSetHandler {
     return new DefaultCursor<E>(this, resultMap, rsw, rowBounds);
   }
 
+  /**
+   * 获取第一个结果，
+   * @param stmt
+   * @return
+   * @throws SQLException
+   */
   private ResultSetWrapper getFirstResultSet(Statement stmt) throws SQLException {
     ResultSet rs = stmt.getResultSet();
     while (rs == null) {

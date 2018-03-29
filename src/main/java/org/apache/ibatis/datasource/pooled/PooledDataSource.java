@@ -33,6 +33,7 @@ import org.apache.ibatis.logging.Log;
 import org.apache.ibatis.logging.LogFactory;
 
 /**
+ * mybatis内部的简单数据库连接池
  * This is a simple, synchronous, thread-safe database connection pool.
  *
  * @author Clinton Begin
@@ -41,20 +42,27 @@ public class PooledDataSource implements DataSource {
 
   private static final Log log = LogFactory.getLog(PooledDataSource.class);
 
+  //存放池的状态，并且存放数据库连接
   private final PoolState state = new PoolState(this);
 
   private final UnpooledDataSource dataSource;
 
   // OPTIONAL CONFIGURATION FIELDS
+  //正在使用连接的数量
   protected int poolMaximumActiveConnections = 10;
+  //空闲连接数
   protected int poolMaximumIdleConnections = 5;
+  //在被强制返回之前,池中连接被检查的时间
   protected int poolMaximumCheckoutTime = 20000;
+
   protected int poolTimeToWait = 20000;
+  //允许连接失败的次数
   protected int poolMaximumLocalBadConnectionTolerance = 3;
   protected String poolPingQuery = "NO PING QUERY SET";
   protected boolean poolPingEnabled;
   protected int poolPingConnectionsNotUsedFor;
 
+  //通过hashcode，判断是哪个链接
   private int expectedConnectionTypeCode;
 
   public PooledDataSource() {
@@ -84,6 +92,7 @@ public class PooledDataSource implements DataSource {
     dataSource = new UnpooledDataSource(driverClassLoader, driver, url, driverProperties);
     expectedConnectionTypeCode = assembleConnectionTypeCode(dataSource.getUrl(), dataSource.getUsername(), dataSource.getPassword());
   }
+
 
   @Override
   public Connection getConnection() throws SQLException {
@@ -348,16 +357,19 @@ public class PooledDataSource implements DataSource {
 
     synchronized (state) {
       state.activeConnections.remove(conn);
+      //判断连接是否合法,注意这个判断是否合法的方式需要进行ping操作，所以也就是每次获取连接都会进行一次数据库查询操作
       if (conn.isValid()) {
         if (state.idleConnections.size() < poolMaximumIdleConnections && conn.getConnectionTypeCode() == expectedConnectionTypeCode) {
           state.accumulatedCheckoutTime += conn.getCheckoutTime();
           if (!conn.getRealConnection().getAutoCommit()) {
             conn.getRealConnection().rollback();
           }
+          //将连接放到池中，返回包装对象
           PooledConnection newConn = new PooledConnection(conn.getRealConnection(), this);
           state.idleConnections.add(newConn);
           newConn.setCreatedTimestamp(conn.getCreatedTimestamp());
           newConn.setLastUsedTimestamp(conn.getLastUsedTimestamp());
+          //废除传入的连接
           conn.invalidate();
           if (log.isDebugEnabled()) {
             log.debug("Returned connection " + newConn.getRealHashCode() + " to pool.");
@@ -389,8 +401,11 @@ public class PooledDataSource implements DataSource {
     long t = System.currentTimeMillis();
     int localBadConnectionCount = 0;
 
+   // 最外面是while死循环，如果一直拿不到connection，则不断尝试,异常除外
     while (conn == null) {
+
       synchronized (state) {
+
         if (!state.idleConnections.isEmpty()) {
           // Pool has available connection
           conn = state.idleConnections.remove(0);
@@ -407,8 +422,10 @@ public class PooledDataSource implements DataSource {
             }
           } else {
             // Cannot create new connection
+            //取得activeConnections列表的第一个（最老的）
             PooledConnection oldestActiveConnection = state.activeConnections.get(0);
             long longestCheckoutTime = oldestActiveConnection.getCheckoutTime();
+            //如果checkout时间过长，则这个connection标记为overdue（过期）
             if (longestCheckoutTime > poolMaximumCheckoutTime) {
               // Can claim overdue connection
               state.claimedOverdueConnectionCount++;
@@ -430,6 +447,7 @@ public class PooledDataSource implements DataSource {
                   log.debug("Bad connection. Could not roll back");
                 }  
               }
+              //删掉最老的连接，然后再new一个新连接
               conn = new PooledConnection(oldestActiveConnection.getRealConnection(), this);
               conn.setCreatedTimestamp(oldestActiveConnection.getCreatedTimestamp());
               conn.setLastUsedTimestamp(oldestActiveConnection.getLastUsedTimestamp());
@@ -441,6 +459,7 @@ public class PooledDataSource implements DataSource {
               // Must wait
               try {
                 if (!countedWait) {
+                  //统计信息：等待+1,只加一次
                   state.hadToWaitCount++;
                   countedWait = true;
                 }
@@ -448,6 +467,7 @@ public class PooledDataSource implements DataSource {
                   log.debug("Waiting as long as " + poolTimeToWait + " milliseconds for connection.");
                 }
                 long wt = System.currentTimeMillis();
+                //睡一会儿吧
                 state.wait(poolTimeToWait);
                 state.accumulatedWaitTime += System.currentTimeMillis() - wt;
               } catch (InterruptedException e) {
@@ -456,6 +476,8 @@ public class PooledDataSource implements DataSource {
             }
           }
         }
+
+
         if (conn != null) {
           // ping to server and check the connection is valid or not
           if (conn.isValid()) {
@@ -483,11 +505,14 @@ public class PooledDataSource implements DataSource {
             }
           }
         }
+
+
       }
 
     }
 
     if (conn == null) {
+      //出异常
       if (log.isDebugEnabled()) {
         log.debug("PooledDataSource: Unknown severe error condition.  The connection pool returned a null connection.");
       }
@@ -499,7 +524,7 @@ public class PooledDataSource implements DataSource {
 
   /*
    * Method to check to see if a connection is still usable
-   *
+   * 检查连接是否可用
    * @param conn - the connection to check
    * @return True if the connection is still usable
    */
@@ -554,6 +579,7 @@ public class PooledDataSource implements DataSource {
 
   /*
    * Unwraps a pooled connection to get to the 'real' connection
+   * 还原被包装的connection
    *
    * @param conn - the pooled connection to unwrap
    * @return The 'real' connection
@@ -568,6 +594,10 @@ public class PooledDataSource implements DataSource {
     return conn;
   }
 
+  /**
+   * 垃圾回收钱的清理
+   * @throws Throwable
+   */
   protected void finalize() throws Throwable {
     forceCloseAll();
     super.finalize();

@@ -27,6 +27,7 @@ import org.apache.ibatis.datasource.DataSourceException;
 import org.apache.ibatis.datasource.DataSourceFactory;
 
 /**
+ * 通过jndi(Java Naming and Directory Interface)初始化数据源
  * @author Clinton Begin
  */
 public class JndiDataSourceFactory implements DataSourceFactory {
@@ -40,6 +41,7 @@ public class JndiDataSourceFactory implements DataSourceFactory {
   @Override
   public void setProperties(Properties properties) {
     try {
+      //JNDI对象
       InitialContext initCtx;
       Properties env = getEnvProperties(properties);
       if (env == null) {
@@ -66,6 +68,11 @@ public class JndiDataSourceFactory implements DataSourceFactory {
     return dataSource;
   }
 
+  /**
+   * 获取env开头的配置文件中的属性
+   * @param allProps
+   * @return
+   */
   private static Properties getEnvProperties(Properties allProps) {
     final String PREFIX = ENV_PREFIX;
     Properties contextProperties = null;

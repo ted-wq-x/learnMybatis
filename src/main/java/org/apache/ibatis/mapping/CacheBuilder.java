@@ -90,15 +90,23 @@ public class CacheBuilder {
   }
 
   public Cache build() {
+    // 链式构建，对于没有设置的属性，设置默认值
     setDefaultImplementations();
-    Cache cache = newBaseCacheInstance(implementation, id);
+
+    // 接口级别的（这个表述不准确，例如AuthorMapper接口，id就是这个名称）
+    Cache cache = newBaseCacheInstance(implementation, id);//使用基本构造器，创建对象，id（构造器参数）为名称
+
+    //获取的得cache节点中properties的配置，组装到cache中去
     setCacheProperties(cache);
     // issue #352, do not apply decorators to custom caches
+    // 对cache进行装饰
     if (PerpetualCache.class.equals(cache.getClass())) {
       for (Class<? extends Cache> decorator : decorators) {
+        // 所有的装饰者都有带参数的构造器
         cache = newCacheDecoratorInstance(decorator, cache);
         setCacheProperties(cache);
       }
+      // 基本的装饰器
       cache = setStandardDecorators(cache);
     } else if (!LoggingCache.class.isAssignableFrom(cache.getClass())) {
       cache = new LoggingCache(cache);
@@ -106,6 +114,9 @@ public class CacheBuilder {
     return cache;
   }
 
+  /**
+   * 设置默认值
+   */
   private void setDefaultImplementations() {
     if (implementation == null) {
       implementation = PerpetualCache.class;
@@ -129,6 +140,7 @@ public class CacheBuilder {
         cache = new SerializedCache(cache);
       }
       cache = new LoggingCache(cache);
+
       cache = new SynchronizedCache(cache);
       if (blocking) {
         cache = new BlockingCache(cache);
@@ -139,6 +151,10 @@ public class CacheBuilder {
     }
   }
 
+  /**
+   * 从配置文件中注入第三方的缓存，设置相关属性
+   * @param cache
+   */
   private void setCacheProperties(Cache cache) {
     if (properties != null) {
       MetaObject metaCache = SystemMetaObject.forObject(cache);
@@ -176,6 +192,7 @@ public class CacheBuilder {
         }
       }
     }
+    //下面的if是测试使用的
     if (InitializingObject.class.isAssignableFrom(cache.getClass())){
       try {
         ((InitializingObject) cache).initialize();

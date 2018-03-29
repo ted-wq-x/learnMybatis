@@ -17,13 +17,47 @@ package org.apache.ibatis.plugin;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+
+import org.apache.ibatis.io.Resources;
+import org.apache.ibatis.parsing.XNode;
+import org.apache.ibatis.parsing.XPathParser;
 import org.junit.Test;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.Reader;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
 public class PluginTest {
+
+  @Test
+  public void myTest() throws ClassNotFoundException, IllegalAccessException, InstantiationException, IOException {
+    final String resource = "org/apache/ibatis/builder/MapperConfig.xml";
+    final InterceptorChain interceptorChain = new InterceptorChain();
+    Reader resourceAsStream = Resources.getResourceAsReader(resource);
+    XPathParser xPathParser = new XPathParser(resourceAsStream);
+    XNode xNode = xPathParser.evalNode("/configuration").evalNode("plugins");
+    if (xNode != null) {
+      for (XNode child : xNode.getChildren()) {
+        String interceptor = child.getStringAttribute("interceptor");
+        Properties properties = child.getChildrenAsProperties();
+        Interceptor interceptorInstance = (Interceptor) PluginTest.class.getClassLoader().loadClass(interceptor)
+                .newInstance();
+        interceptorInstance.setProperties(properties);
+        interceptorChain.addInterceptor(interceptorInstance);
+      }
+    }
+
+    Map map = new HashMap();
+    map.put("name", "wq");
+    // jdk动态代理
+    map = (Map) interceptorChain.pluginAll(map);
+
+    System.out.println(map.get("name"));
+    System.out.println(map.get("age"));
+  }
 
   @Test
   public void mapPluginShouldInterceptGet() {
@@ -39,22 +73,45 @@ public class PluginTest {
     assertFalse("Always".equals(map.toString()));
   }
 
-  @Intercepts({
-      @Signature(type = Map.class, method = "get", args = {Object.class})})
-  public static class AlwaysMapPlugin implements Interceptor {
-    @Override
-    public Object intercept(Invocation invocation) throws Throwable {
-      return "Always";
-    }
 
-    @Override
-    public Object plugin(Object target) {
-      return Plugin.wrap(target, this);
-    }
 
-    @Override
-    public void setProperties(Properties properties) {
-    }
+}
+/**
+ * 拦截的是map接口的get方法
+ */
+@Intercepts({
+        @Signature(type = Map.class, method = "get", args = {Object.class})})
+ class AlwaysMapPlugin implements Interceptor {
+
+  private Properties properties;
+
+  /**
+   * 返回值总是always
+   * @param invocation
+   * @return
+   * @throws Throwable
+   */
+  @Override
+  public Object intercept(Invocation invocation) throws Throwable {
+
+    return "Always:"+invocation.proceed();
   }
 
+  @Override
+  public Object plugin(Object target) {
+    if (target instanceof Map) {
+      Map map = (Map) target;
+      for (Map.Entry<Object, Object> entry : properties.entrySet()) {
+        map.put(entry.getKey(), entry.getValue());
+      }
+      return Plugin.wrap(map, this);
+    }
+    return Plugin.wrap(target, this);
+  }
+
+  @Override
+  public void setProperties(Properties properties) {
+    this.properties = properties;
+
+  }
 }

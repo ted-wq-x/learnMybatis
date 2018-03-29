@@ -46,8 +46,12 @@ public class XPathParser {
 
   private final Document document;
   private boolean validation;
+
+  //entityResolver使用了mybatis自己包装的，这样就可以在不联网的情况下验证dtd
   private EntityResolver entityResolver;
   private Properties variables;
+
+  //XPath解析器，用的都是JDK的类包,封装了一下，使得使用起来更方便
   private XPath xpath;
 
   public XPathParser(String xml) {
@@ -231,11 +235,12 @@ public class XPathParser {
       DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
       factory.setValidating(validation);
 
-      factory.setNamespaceAware(false);
-      factory.setIgnoringComments(true);
-      factory.setIgnoringElementContentWhitespace(false);
-      factory.setCoalescing(false);
-      factory.setExpandEntityReferences(true);
+      //设置属性
+      factory.setNamespaceAware(false);//名称空间
+      factory.setIgnoringComments(true);//忽略注释
+      factory.setIgnoringElementContentWhitespace(false);//忽略空白
+      factory.setCoalescing(false);//把 CDATA 节点转换为 Text 节点
+      factory.setExpandEntityReferences(true);//扩展实体引用
 
       DocumentBuilder builder = factory.newDocumentBuilder();
       builder.setEntityResolver(entityResolver);

@@ -69,6 +69,7 @@ public class MapperMethod {
         break;
       }
       case SELECT:
+        //查询语句，对result进行映射
         if (method.returnsVoid() && method.hasResultHandler()) {
           executeWithResultHandler(sqlSession, args);
           result = null;
@@ -96,6 +97,7 @@ public class MapperMethod {
     return result;
   }
 
+  //这个方法对返回值的类型进行了一些检查，使得更安全
   private Object rowCountResult(int rowCount) {
     final Object result;
     if (method.returnsVoid()) {
@@ -112,6 +114,7 @@ public class MapperMethod {
     return result;
   }
 
+  //结果处理器
   private void executeWithResultHandler(SqlSession sqlSession, Object[] args) {
     MappedStatement ms = sqlSession.getConfiguration().getMappedStatement(command.getName());
     if (!StatementType.CALLABLE.equals(ms.getStatementType())
@@ -129,6 +132,7 @@ public class MapperMethod {
     }
   }
 
+  //多条记录
   private <E> Object executeForMany(SqlSession sqlSession, Object[] args) {
     List<E> result;
     Object param = method.convertArgsToSqlCommandParam(args);

@@ -23,14 +23,15 @@ import org.apache.ibatis.cache.Cache;
 
 /**
  * Lru (least recently used) cache decorator
+ * 使用的是基于LinkedHashMap的lru缓存方式，同时注意这个设计，对于过期的元素不是立马删除（keymap中的是立马删除的），而是在下次添加的时候删除
  *
  * @author Clinton Begin
  */
 public class LruCache implements Cache {
 
   private final Cache delegate;
-  private Map<Object, Object> keyMap;
-  private Object eldestKey;
+  private Map<Object, Object> keyMap;//key,key，很奇怪数据不存放在这里,这个设计真的很是奇怪
+  private Object eldestKey;//记录上个被移除的元素
 
   public LruCache(Cache delegate) {
     this.delegate = delegate;

@@ -53,6 +53,9 @@ public class XMLStatementBuilder extends BaseBuilder {
     this.requiredDatabaseId = databaseId;
   }
 
+  /**
+   * select标签里面flushCache默认为false，insert、update、delete标签里的flushCache默认为true，这是官方文档里说的，代码也是这么写的
+   */
   public void parseStatementNode() {
     String id = context.getStringAttribute("id");
     String databaseId = context.getStringAttribute("databaseId");

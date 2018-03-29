@@ -29,7 +29,7 @@ import org.apache.ibatis.cache.Cache;
 public class FifoCache implements Cache {
 
   private final Cache delegate;
-  private final Deque<Object> keyList;
+  private final Deque<Object> keyList;//存放的是key
   private int size;
 
   public FifoCache(Cache delegate) {

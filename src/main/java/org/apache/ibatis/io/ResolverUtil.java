@@ -57,7 +57,7 @@ import org.apache.ibatis.logging.LogFactory;
  * @author Tim Fennell
  */
 public class ResolverUtil<T> {
-  /*
+  /**
    * An instance of Log to use for logging in this class.
    */
   private static final Log log = LogFactory.getLog(ResolverUtil.class);

@@ -22,6 +22,7 @@ import org.apache.ibatis.plugin.Plugin;
 
 import java.util.Properties;
 
+//这个注解不能少
 @Intercepts({})
 public class ExamplePlugin implements Interceptor {
   private Properties properties;
@@ -29,6 +30,7 @@ public class ExamplePlugin implements Interceptor {
   public Object intercept(Invocation invocation) throws Throwable {
     return invocation.proceed();
   }
+
 
   @Override
   public Object plugin(Object target) {

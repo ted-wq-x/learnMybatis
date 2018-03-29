@@ -53,10 +53,12 @@ public abstract class BaseExecutor implements Executor {
 
   protected Transaction transaction;
   protected Executor wrapper;
-
+  //延迟加载队列（线程安全）
   protected ConcurrentLinkedQueue<DeferredLoad> deferredLoads;
+  //使用map，無鎖
   protected PerpetualCache localCache;
   protected PerpetualCache localOutputParameterCache;
+
   protected Configuration configuration;
 
   protected int queryStack;
@@ -149,6 +151,7 @@ public abstract class BaseExecutor implements Executor {
     List<E> list;
     try {
       queryStack++;
+      //db的查询结果会保存到本地缓存中
       list = resultHandler == null ? (List<E>) localCache.getObject(key) : null;
       if (list != null) {
         handleLocallyCachedOutputParameters(ms, key, parameter, boundSql);
@@ -347,7 +350,8 @@ public abstract class BaseExecutor implements Executor {
   public void setExecutorWrapper(Executor wrapper) {
     this.wrapper = wrapper;
   }
-  
+
+  //延迟加载
   private static class DeferredLoad {
 
     private final MetaObject resultObject;

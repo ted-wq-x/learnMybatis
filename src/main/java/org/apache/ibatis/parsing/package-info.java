@@ -15,5 +15,6 @@
  */
 /**
  * Parsing utils
+ * 属性解析
  */
 package org.apache.ibatis.parsing;

@@ -62,6 +62,10 @@ public interface Executor {
 
   boolean isClosed();
 
+  /**
+   * 没看出来这个方法的作用
+   * @param executor
+   */
   void setExecutorWrapper(Executor executor);
 
 }

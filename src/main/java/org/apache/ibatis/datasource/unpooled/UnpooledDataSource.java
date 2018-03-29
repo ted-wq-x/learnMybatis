@@ -50,6 +50,7 @@ public class UnpooledDataSource implements DataSource {
   private Integer defaultTransactionIsolationLevel;
 
   static {
+
     Enumeration<Driver> drivers = DriverManager.getDrivers();
     while (drivers.hasMoreElements()) {
       Driver driver = drivers.nextElement();
@@ -198,11 +199,16 @@ public class UnpooledDataSource implements DataSource {
 
   private Connection doGetConnection(Properties properties) throws SQLException {
     initializeDriver();
+    //使用驱动进行连接，这有很大部分都是jdk的东西
     Connection connection = DriverManager.getConnection(url, properties);
     configureConnection(connection);
     return connection;
   }
 
+  /**
+   * 注册驱动
+   * @throws SQLException
+   */
   private synchronized void initializeDriver() throws SQLException {
     if (!registeredDrivers.containsKey(driver)) {
       Class<?> driverType;
@@ -223,6 +229,11 @@ public class UnpooledDataSource implements DataSource {
     }
   }
 
+  /**
+   * 进行连接后的一些属性设置
+   * @param conn
+   * @throws SQLException
+   */
   private void configureConnection(Connection conn) throws SQLException {
     if (autoCommit != null && autoCommit != conn.getAutoCommit()) {
       conn.setAutoCommit(autoCommit);
@@ -232,6 +243,9 @@ public class UnpooledDataSource implements DataSource {
     }
   }
 
+  /**
+   * 驱动代理，主要用于添加日志
+   */
   private static class DriverProxy implements Driver {
     private Driver driver;
 

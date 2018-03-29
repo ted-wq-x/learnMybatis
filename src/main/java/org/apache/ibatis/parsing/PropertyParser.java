@@ -50,6 +50,12 @@ public class PropertyParser {
     // Prevent Instantiation
   }
 
+  /**
+   * 对括号中的键值对进行解析，默认分隔符为：
+   * @param string
+   * @param variables
+   * @return
+   */
   public static String parse(String string, Properties variables) {
     VariableTokenHandler handler = new VariableTokenHandler(variables);
     GenericTokenParser parser = new GenericTokenParser("${", "}", handler);

@@ -566,6 +566,7 @@ public class Configuration {
 
   public Executor newExecutor(Transaction transaction, ExecutorType executorType) {
     executorType = executorType == null ? defaultExecutorType : executorType;
+    //防止出现将defaultExecutorType设置为null的情况
     executorType = executorType == null ? ExecutorType.SIMPLE : executorType;
     Executor executor;
     if (ExecutorType.BATCH == executorType) {
@@ -575,9 +576,12 @@ public class Configuration {
     } else {
       executor = new SimpleExecutor(this, transaction);
     }
+
+    //如果要求缓存，生成另一种CachingExecutor(默认就是有缓存),装饰者模式,所以默认都是返回CachingExecutor
     if (cacheEnabled) {
       executor = new CachingExecutor(executor);
     }
+    //此处调用插件,通过插件可以改变Executor行为,保存
     executor = (Executor) interceptorChain.pluginAll(executor);
     return executor;
   }
@@ -841,6 +845,7 @@ public class Configuration {
     }
   }
 
+  //静态内部类,严格的Map，不允许多次覆盖key所对应的value,当key不存在时，返回null
   protected static class StrictMap<V> extends HashMap<String, V> {
 
     private static final long serialVersionUID = -4950446264854982944L;

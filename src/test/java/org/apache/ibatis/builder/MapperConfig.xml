@@ -30,7 +30,7 @@
     <setting name="multipleResultSetsEnabled" value="true"/>
     <setting name="useColumnLabel" value="true"/>
     <setting name="useGeneratedKeys" value="false"/>
-    <setting name="defaultExecutorType" value="SIMPLE"/>
+    <setting name="default ExecutorType" value="SIMPLE"/>
     <setting name="defaultStatementTimeout" value="25"/>
   </settings>
 
@@ -54,6 +54,9 @@
   <plugins>
     <plugin interceptor="org.apache.ibatis.builder.ExamplePlugin">
       <property name="pluginProperty" value="100"/>
+    </plugin>
+    <plugin interceptor="org.apache.ibatis.plugin.AlwaysMapPlugin">
+      <property name="age" value="12"/>
     </plugin>
   </plugins>
 

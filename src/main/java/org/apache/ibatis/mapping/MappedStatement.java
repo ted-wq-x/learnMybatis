@@ -38,6 +38,8 @@ public final class MappedStatement {
   private String id;
   private Integer fetchSize;
   private Integer timeout;
+
+  // sql的类型，sql解析用的，默认是PREPARED
   private StatementType statementType;
   private ResultSetType resultSetType;
   private SqlSource sqlSource;
@@ -64,6 +66,13 @@ public final class MappedStatement {
   public static class Builder {
     private MappedStatement mappedStatement = new MappedStatement();
 
+    /**
+     *
+     * @param configuration
+     * @param id
+     * @param sqlSource
+     * @param sqlCommandType
+     */
     public Builder(Configuration configuration, String id, SqlSource sqlSource, SqlCommandType sqlCommandType) {
       mappedStatement.configuration = configuration;
       mappedStatement.id = id;
@@ -185,6 +194,7 @@ public final class MappedStatement {
       assert mappedStatement.id != null;
       assert mappedStatement.sqlSource != null;
       assert mappedStatement.lang != null;
+      //此处是亮点，值得学习，返回的是集合经过包装，无法修改里面的元素
       mappedStatement.resultMaps = Collections.unmodifiableList(mappedStatement.resultMaps);
       return mappedStatement;
     }

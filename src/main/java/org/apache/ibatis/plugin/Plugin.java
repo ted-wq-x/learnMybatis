@@ -26,6 +26,7 @@ import java.util.Set;
 import org.apache.ibatis.reflection.ExceptionUtil;
 
 /**
+ * 使用的是jdk代理，所以只能代理接口
  * @author Clinton Begin
  */
 public class Plugin implements InvocationHandler {
@@ -40,10 +41,19 @@ public class Plugin implements InvocationHandler {
     this.signatureMap = signatureMap;
   }
 
+  /**
+   * 代理方法
+   * @param target
+   * @param interceptor
+   * @return
+   */
   public static Object wrap(Object target, Interceptor interceptor) {
+    //获取类（接口）+方法
     Map<Class<?>, Set<Method>> signatureMap = getSignatureMap(interceptor);
     Class<?> type = target.getClass();
+    //target中包的signatureMap的类
     Class<?>[] interfaces = getAllInterfaces(type, signatureMap);
+    //如果存在需要拦截的接口，则构造jdk代理
     if (interfaces.length > 0) {
       return Proxy.newProxyInstance(
           type.getClassLoader(),
@@ -58,6 +68,7 @@ public class Plugin implements InvocationHandler {
     try {
       Set<Method> methods = signatureMap.get(method.getDeclaringClass());
       if (methods != null && methods.contains(method)) {
+        //调用插件的方法
         return interceptor.intercept(new Invocation(target, method, args));
       }
       return method.invoke(target, args);
@@ -66,6 +77,11 @@ public class Plugin implements InvocationHandler {
     }
   }
 
+  /**
+   * 获取方法标签
+   * @param interceptor
+   * @return
+   */
   private static Map<Class<?>, Set<Method>> getSignatureMap(Interceptor interceptor) {
     Intercepts interceptsAnnotation = interceptor.getClass().getAnnotation(Intercepts.class);
     // issue #251
@@ -90,6 +106,12 @@ public class Plugin implements InvocationHandler {
     return signatureMap;
   }
 
+  /**
+   * 获取type类的接口中包含在signatureMap中的接口
+   * @param type
+   * @param signatureMap
+   * @return
+   */
   private static Class<?>[] getAllInterfaces(Class<?> type, Map<Class<?>, Set<Method>> signatureMap) {
     Set<Class<?>> interfaces = new HashSet<Class<?>>();
     while (type != null) {

@@ -40,9 +40,9 @@ public class TransactionalCache implements Cache {
 
   private static final Log log = LogFactory.getLog(TransactionalCache.class);
 
-  private final Cache delegate;
+  private final Cache delegate;//
   private boolean clearOnCommit;
-  private final Map<Object, Object> entriesToAddOnCommit;
+  private final Map<Object, Object> entriesToAddOnCommit;//临时的缓存，注意put方法,在调用commit时才进行提交
   private final Set<Object> entriesMissedInCache;
 
   public TransactionalCache(Cache delegate) {
@@ -117,6 +117,9 @@ public class TransactionalCache implements Cache {
     entriesMissedInCache.clear();
   }
 
+  /**
+   * 进行真正的缓存提交
+   */
   private void flushPendingEntries() {
     for (Map.Entry<Object, Object> entry : entriesToAddOnCommit.entrySet()) {
       delegate.putObject(entry.getKey(), entry.getValue());

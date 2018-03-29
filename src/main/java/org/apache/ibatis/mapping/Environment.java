@@ -23,8 +23,8 @@ import org.apache.ibatis.transaction.TransactionFactory;
  * @author Clinton Begin
  */
 public final class Environment {
-  private final String id;
-  private final TransactionFactory transactionFactory;
+  private final String id;//用於指定使用哪個環境
+  private final TransactionFactory transactionFactory;//默認是關閉連接
   private final DataSource dataSource;
 
   public Environment(String id, TransactionFactory transactionFactory, DataSource dataSource) {

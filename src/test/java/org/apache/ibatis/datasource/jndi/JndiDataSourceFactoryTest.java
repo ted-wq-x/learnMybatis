@@ -81,6 +81,9 @@ public class JndiDataSourceFactoryTest extends BaseDataTest {
     }
   }
 
+  /**
+   * 注意是静态类设置一次参数后new对象的属性也就有了
+   */
   public static class MockContext extends InitialContext {
     private static Map<String,Object> bindings = new HashMap<String,Object>();
 

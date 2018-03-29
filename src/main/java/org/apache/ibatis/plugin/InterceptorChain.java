@@ -26,6 +26,11 @@ public class InterceptorChain {
 
   private final List<Interceptor> interceptors = new ArrayList<Interceptor>();
 
+  /**
+   * 最后添加的拦截器，最先执行，进行包装之后的类,虽然在插件的配置中有指定类和方法的位置，但是因为是层层包装，所以造成了生成多层动态代理，会影响一定的性能
+   * @param target
+   * @return
+   */
   public Object pluginAll(Object target) {
     for (Interceptor interceptor : interceptors) {
       target = interceptor.plugin(target);

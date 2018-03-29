@@ -15,5 +15,6 @@
  */
 /**
  * JNDI Datasource factory
+ * Java Naming and Directory Interface
  */
 package org.apache.ibatis.datasource.jndi;

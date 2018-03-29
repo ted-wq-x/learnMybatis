@@ -59,7 +59,7 @@ public class SqlSessionTest extends BaseDataTest {
 
   @BeforeClass
   public static void setup() throws Exception {
-    createBlogDataSource();
+    createBlogDataSource();//創建庫并導入基本數據
     final String resource = "org/apache/ibatis/builder/MapperConfig.xml";
     final Reader reader = Resources.getResourceAsReader(resource);
     sqlMapper = new SqlSessionFactoryBuilder().build(reader);
@@ -223,6 +223,8 @@ public class SqlSessionTest extends BaseDataTest {
     SqlSession session = sqlMapper.openSession();
     try {
       List<Author> authors = session.selectList(
+          "org.apache.ibatis.domain.blog.mappers.AuthorMapper.selectAuthor", new Author(101));
+      List<Author> authors1 = session.selectList(
           "org.apache.ibatis.domain.blog.mappers.AuthorMapper.selectAuthor", new Author(101));
       assertEquals(101, authors.get(0).getId());
       assertEquals(Section.NEWS, authors.get(0).getFavouriteSection());

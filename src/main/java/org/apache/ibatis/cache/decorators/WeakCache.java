@@ -26,12 +26,15 @@ import org.apache.ibatis.cache.Cache;
 /**
  * Weak Reference cache decorator.
  * Thanks to Dr. Heinz Kabutz for his guidance here.
+ *
+ * 对于软引用，在每次操作真实队列的时候，都会去referenceQueue中判断是否还存在，如果不存在，那么就会从真实队列中删除
  * 
  * @author Clinton Begin
  */
 public class WeakCache implements Cache {
   private final Deque<Object> hardLinksToAvoidGarbageCollection;
   private final ReferenceQueue<Object> queueOfGarbageCollectedEntries;
+  // delegate：代表
   private final Cache delegate;
   private int numberOfHardLinks;
 
