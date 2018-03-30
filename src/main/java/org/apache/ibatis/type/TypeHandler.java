@@ -21,6 +21,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 /**
+ * 这几个方法还是很好理解的
  * @author Clinton Begin
  */
 public interface TypeHandler<T> {

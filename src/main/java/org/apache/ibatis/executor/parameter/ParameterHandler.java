@@ -28,6 +28,6 @@ public interface ParameterHandler {
   Object getParameterObject();
 
   void setParameters(PreparedStatement ps)
-      throws SQLException;
+          throws SQLException;
 
 }

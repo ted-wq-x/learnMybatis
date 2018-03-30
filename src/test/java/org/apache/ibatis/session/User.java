@@ -1,5 +1,7 @@
 package org.apache.ibatis.session;
 
+import java.util.List;
+
 /**
  * 项目名称：  mybatis-3<br>
  * 类名称：  User<br>
@@ -10,4 +12,8 @@ package org.apache.ibatis.session;
  */
 public interface User {
     int queryUserIdByName(String name);
+
+    List<Integer> queryAllId();
+
+    UserBo queryUserById(int id);
 }

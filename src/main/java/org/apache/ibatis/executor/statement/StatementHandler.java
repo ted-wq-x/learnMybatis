@@ -33,6 +33,11 @@ public interface StatementHandler {
   Statement prepare(Connection connection, Integer transactionTimeout)
       throws SQLException;
 
+  /**
+   * 设置参数
+   * @param statement
+   * @throws SQLException
+   */
   void parameterize(Statement statement)
       throws SQLException;
 

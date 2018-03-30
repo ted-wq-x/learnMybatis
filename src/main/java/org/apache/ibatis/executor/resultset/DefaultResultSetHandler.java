@@ -146,6 +146,7 @@ public class DefaultResultSetHandler implements ResultSetHandler {
       final ParameterMapping parameterMapping = parameterMappings.get(i);
       if (parameterMapping.getMode() == ParameterMode.OUT || parameterMapping.getMode() == ParameterMode.INOUT) {
         if (ResultSet.class.equals(parameterMapping.getJavaType())) {
+          // 处理光标
           handleRefCursorOutputParameter((ResultSet) cs.getObject(i + 1), parameterMapping, metaParam);
         } else {
           final TypeHandler<?> typeHandler = parameterMapping.getTypeHandler();
@@ -871,6 +872,7 @@ public class DefaultResultSetHandler implements ResultSetHandler {
 
   private void handleRowValuesForNestedResultMap(ResultSetWrapper rsw, ResultMap resultMap, ResultHandler<?> resultHandler, RowBounds rowBounds, ResultMapping parentMapping) throws SQLException {
     final DefaultResultContext<Object> resultContext = new DefaultResultContext<Object>();
+    // 设置跳过的行数
     skipRows(rsw.getResultSet(), rowBounds);
     Object rowValue = previousRowValue;
     while (shouldProcessMoreRows(resultContext, rowBounds) && rsw.getResultSet().next()) {

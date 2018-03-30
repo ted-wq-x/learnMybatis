@@ -83,6 +83,16 @@ DefaultSqlSession-->Executor-->StatementHandler(ParameterHandler，ResultHandler
 
 StatementHandler的创建使用的是RoutingStatementHandler，该类是根据StatementType进行路由用的，简单工厂模式。
 
+### Executor
+
+![](pic/Executor.png)
+
+对于Executor结构，主要使用的是装饰者模式，如CacheExecutor（二级缓存）；模板方法模式，如BaseExecutor。
+首先对于BaseExecutor来说，一个重要的属性就是一级缓存（默认是session级别的，还有一个statement级别），该类负责一级缓存相关的操作，同时需要注意，一级缓存是在构造器中初始化的，
+所以无法关闭，消除缓存影响的方式是，每当使用过一次session之后，清除缓存，也就是需要在sql语句上配置flushCache=true（该属性只针对query操作），
+或者配置成statement，那样所有的一级缓存都会失效，那样每次查询都会清除缓存，update,delete,insert都会清除缓存。
+
+// TODO Executor下面的几个实现类
 
 ### StatementHandler
 
@@ -91,9 +101,29 @@ StatementHandler的创建使用的是RoutingStatementHandler，该类是根据St
 其中RoutingStatementHandler相当于是一个工厂，按照StatementType创建StatementHandler对象。
 而BaseStatementHandler下的结构则是模板方法模式：
 
-* SimpleStatementHandler：相当于是最基本的jdbc的方法调用，如Connection.createStatement().executeQuery()
+* SimpleStatementHandler：相当于是最基本的jdbc的方法调用，如Connection.createStatement().executeQuery()，感觉这个类基本没人使用，哈哈！
 * PreparedStatementHandler：使用了预编译，如Connection.PrepareStatement()
 * CallableStatementHandler：执行存储过程的
+
+默认的是PreparedStatement(在MappedStatement的构造器中定义)，这个参数的指定时在sql语句中（如xml上）。
+
+### ResultSetHandler
+
+默认实现是DefaultResultSetHandler
+
+
+### ParameterHandler(针对PreparedStatement)
+
+默认实现是DefaultParameterHandler，使用TypeHandler进行处理。
+
+
+### TypeHandler(针对PreparedStatement)
+
+实现类有很多，用于对入参和返回参数进行类型处理，转换成java类型已经查询参数设置，也就是针对PreparedStatement进行参数设置和从resultSet获取值。
+
+针对不同的类型有不同的实现类，所以子类很多，这里就不列举了。这里说下BaseTypeHandler类，该类的设计依然是模板模式。同时该类也继承了TypeReference抽象类
+，这个类类似于工具类。
+
 
 
 

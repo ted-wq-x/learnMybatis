@@ -15,6 +15,11 @@
         <setting name="useGeneratedKeys" value="false"/>
         <setting name="defaultExecutorType" value="SIMPLE"/>
         <setting name="defaultStatementTimeout" value="25"/>
+        <!--设置日志的输出方式，不配置默认不会输出-->
+        <setting name="logImpl" value="STDOUT_LOGGING"/>
+
+        <!--修改将一级缓存的级别-->
+        <setting name="localCacheScope" value="STATEMENT"/>
     </settings>
 
   <!--  <typeAliases>

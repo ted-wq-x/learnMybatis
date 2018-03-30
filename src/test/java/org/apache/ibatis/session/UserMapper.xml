@@ -21,7 +21,13 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="org.apache.ibatis.session.User">
-    <select id="queryUserIdByName" parameterType="string" resultType="java.lang.Integer">
+    <select id="queryUserIdByName" parameterType="string" resultType="java.lang.Integer" >
         SELECT u.id FROM mysql.my_user u WHERE u.name = #{name}
+    </select>
+    <select id="queryAllId" resultType="java.lang.Integer">
+        SELECT u.id FROM mysql.my_user u
+    </select>
+    <select id="queryUserById" resultType="org.apache.ibatis.session.UserBo" >
+        SELECT u.id as id ,u.name as name FROM mysql.my_user u WHERE u.id = #{id}
     </select>
 </mapper>
