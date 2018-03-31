@@ -90,9 +90,25 @@ StatementHandler的创建使用的是RoutingStatementHandler，该类是根据St
 对于Executor结构，主要使用的是装饰者模式，如CacheExecutor（二级缓存）；模板方法模式，如BaseExecutor。
 首先对于BaseExecutor来说，一个重要的属性就是一级缓存（默认是session级别的，还有一个statement级别），该类负责一级缓存相关的操作，同时需要注意，一级缓存是在构造器中初始化的，
 所以无法关闭，消除缓存影响的方式是，每当使用过一次session之后，清除缓存，也就是需要在sql语句上配置flushCache=true（该属性只针对query操作），
-或者配置成statement，那样所有的一级缓存都会失效，那样每次查询都会清除缓存，update,delete,insert都会清除缓存。
+或者配置成statement，那样所有的一级缓存都会失效，那样每次查询都会清除缓存，update会清除缓存,没有delete和insert，使用的都是update方法，同时
+在进行操作事务的时候也会清理缓存(看看DefaultSqlSession类的方法)。
 
-// TODO Executor下面的几个实现类
+#### SimpleExecutor
+
+这个执行器在调用statementHandler进行doQuery或者doUpdate时都会关闭statement。
+
+#### ReuseExecutor
+
+ReuseExecutor在prepareStatement()阶段，判断缓存中是否命中。需要手动执行flushStatements()，关闭statement清除缓存。
+
+#### BatchExecutor
+
+在BatchExecutor中需要手动执行flushStatements()，这样才会真的执行sql语句。
+
+
+注：对于flushStatement(boolean)，参数为true，只针对batchExecutor有效，因为这个执行器只有在执行该方法时真正的去执行sql，为true就不执行了。
+多以这个方法对不同的executor有不同的意义。
+
 
 ### StatementHandler
 
@@ -125,7 +141,31 @@ StatementHandler的创建使用的是RoutingStatementHandler，该类是根据St
 ，这个类类似于工具类。
 
 
+## JDBC相关知识
 
+在使用jdbc的connection.createStatement()时，有两个参数ResultSetType和ResultSet。
+
+con.createStatement()：生成的结果集：不滚动、不敏感、不可更新！
+
+con.createStatement(int,int)：<br>
+第一个参数：
+
+*  ResultSet.TYPE_FORWARD_ONLY：不滚动结果集；
+
+*  ResultSet.TYPE_SCROLL_INSENSITIVE：滚动结果集，但结果集数据不会再跟随数据库而变化；
+
+*  ResultSet.TYPE_SCROLL_SENSITIVE：滚动结果集，但结果集数据会再跟随数据库而变化；
+
+第二个参数：
+
+* CONCUR_READ_ONLY：结果集是只读的，不能通过修改结果集而反向影响数据库；
+
+* CONCUR_UPDATABLE：结果集是可更新的，对结果集的更新可以反向影响数据库。
+
+
+## 问题
+
+1. 三个不同的executor，分别在什么场景下使用？
 
 
 

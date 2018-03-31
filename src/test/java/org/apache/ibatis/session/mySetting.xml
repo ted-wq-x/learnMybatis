@@ -13,7 +13,7 @@
         <setting name="multipleResultSetsEnabled" value="true"/>
         <setting name="useColumnLabel" value="true"/>
         <setting name="useGeneratedKeys" value="false"/>
-        <setting name="defaultExecutorType" value="SIMPLE"/>
+        <setting name="defaultExecutorType" value="REUSE"/>
         <setting name="defaultStatementTimeout" value="25"/>
         <!--设置日志的输出方式，不配置默认不会输出-->
         <setting name="logImpl" value="STDOUT_LOGGING"/>
@@ -57,9 +57,9 @@
             </transactionManager>
             <dataSource type="UNPOOLED">
                 <property name="driver" value="com.mysql.jdbc.Driver"/>
-                <property name="url" value="jdbc:mysql://127.0.0.1:3306/mysql"/>
+                <property name="url" value="jdbc:mysql://118.24.75.135:3306/wordpress"/>
                 <property name="username" value="root"/>
-                <property name="password" value="wq123"/>
+                <property name="password" value="wangqiang332"/>
             </dataSource>
         </environment>
     </environments>

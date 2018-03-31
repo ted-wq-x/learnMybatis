@@ -38,6 +38,9 @@ import org.apache.ibatis.transaction.Transaction;
  */
 public class ReuseExecutor extends BaseExecutor {
 
+  /**
+   * 在preparePara阶段将数据放到map中，需要手动执行flushStatements，清楚缓存
+   */
   private final Map<String, Statement> statementMap = new HashMap<String, Statement>();
 
   public ReuseExecutor(Configuration configuration, Transaction transaction) {
@@ -77,16 +80,25 @@ public class ReuseExecutor extends BaseExecutor {
     return Collections.emptyList();
   }
 
+  /**
+   * 在参数准备创建statement阶段，判断map中是否有存在的statement，有的话就复用
+   * @param handler
+   * @param statementLog
+   * @return
+   * @throws SQLException
+   */
   private Statement prepareStatement(StatementHandler handler, Log statementLog) throws SQLException {
     Statement stmt;
     BoundSql boundSql = handler.getBoundSql();
     String sql = boundSql.getSql();
+    // 重点
     if (hasStatementFor(sql)) {
       stmt = getStatement(sql);
       applyTransactionTimeout(stmt);
     } else {
       Connection connection = getConnection(statementLog);
       stmt = handler.prepare(connection, transaction.getTimeout());
+      // 将sql和statement存起来
       putStatement(sql, stmt);
     }
     handler.parameterize(stmt);

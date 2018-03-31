@@ -99,4 +99,24 @@ public class MyTest {
         System.out.println(userBo1);
         Assert.assertEquals(userBo1.getName(),"wq");
     }
+
+
+
+    /**
+     * 在setting.xml中设置执行器为reuse，所以下面的输出为一次sql执行
+     */
+    @Test
+    public void testCacheWithAttrReuseExecutor(){
+        SqlSession sqlSession = sqlSessionFactory.openSession();
+        UserBo userBo = sqlSession.selectOne("org.apache.ibatis.session.User.queryUserById", 1);
+
+        System.out.println(userBo);
+        Assert.assertEquals(userBo.getName(),"wq");
+        userBo.setName("another");
+        UserBo userBo1 = sqlSession.selectOne("org.apache.ibatis.session.User.queryUserById", 1);
+
+        System.out.println(userBo1);
+        Assert.assertEquals(userBo1.getName(),"wq");
+//        sqlSession.flushStatements();
+    }
 }

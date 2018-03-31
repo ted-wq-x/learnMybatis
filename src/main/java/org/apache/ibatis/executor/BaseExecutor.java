@@ -55,13 +55,14 @@ public abstract class BaseExecutor implements Executor {
   protected Executor wrapper;
   //延迟加载队列（线程安全）
   protected ConcurrentLinkedQueue<DeferredLoad> deferredLoads;
-  //使用map，無鎖
+  //使用map，无锁
   protected PerpetualCache localCache;
   protected PerpetualCache localOutputParameterCache;
 
   protected Configuration configuration;
 
   protected int queryStack;
+
   private boolean closed;
 
   protected BaseExecutor(Configuration configuration, Transaction transaction) {
@@ -274,6 +275,12 @@ public abstract class BaseExecutor implements Executor {
   protected abstract int doUpdate(MappedStatement ms, Object parameter)
       throws SQLException;
 
+  /**
+   * 参数其实只针对batchExecutor有效
+   * @param isRollback
+   * @return
+   * @throws SQLException
+   */
   protected abstract List<BatchResult> doFlushStatements(boolean isRollback)
       throws SQLException;
 
@@ -387,6 +394,7 @@ public abstract class BaseExecutor implements Executor {
       @SuppressWarnings( "unchecked" )
       // we suppose we get back a List
       List<Object> list = (List<Object>) localCache.getObject(key);
+      // 类型转换
       Object value = resultExtractor.extractObjectFromList(list, targetType);
       resultObject.setValue(property, value);
     }

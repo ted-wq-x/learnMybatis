@@ -23,10 +23,12 @@ import java.lang.reflect.Array;
 import java.util.List;
 
 /**
+ * 结果的抽取器
  * @author Andrew Gustafson
  */
 public class ResultExtractor {
   private final Configuration configuration;
+  // 创建对象的工具类
   private final ObjectFactory objectFactory;
 
   public ResultExtractor(Configuration configuration, ObjectFactory objectFactory) {

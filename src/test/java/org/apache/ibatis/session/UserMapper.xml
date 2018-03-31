@@ -22,12 +22,12 @@
 
 <mapper namespace="org.apache.ibatis.session.User">
     <select id="queryUserIdByName" parameterType="string" resultType="java.lang.Integer" >
-        SELECT u.id FROM mysql.my_user u WHERE u.name = #{name}
+        SELECT u.id FROM wordpress.my_user u WHERE u.name = #{name}
     </select>
     <select id="queryAllId" resultType="java.lang.Integer">
-        SELECT u.id FROM mysql.my_user u
+        SELECT u.id FROM wordpress.my_user u
     </select>
     <select id="queryUserById" resultType="org.apache.ibatis.session.UserBo" >
-        SELECT u.id as id ,u.name as name FROM mysql.my_user u WHERE u.id = #{id}
+        SELECT u.id as id ,u.name as name FROM wordpress.my_user u WHERE u.id = #{id}
     </select>
 </mapper>

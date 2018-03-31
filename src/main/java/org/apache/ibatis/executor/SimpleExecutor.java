@@ -81,11 +81,14 @@ public class SimpleExecutor extends BaseExecutor {
     return Collections.emptyList();
   }
 
+
   private Statement prepareStatement(StatementHandler handler, Log statementLog) throws SQLException {
     Statement stmt;
     Connection connection = getConnection(statementLog);
     stmt = handler.prepare(connection, transaction.getTimeout());
-    // 参数
+    // 参数，注意这个SimpleExecutor和SimpleStatement是没有关系的
+    // 不能简单的理解成SimpleExecutor只能使用SimpleStatement
+    // 设置参数
     handler.parameterize(stmt);
     return stmt;
   }

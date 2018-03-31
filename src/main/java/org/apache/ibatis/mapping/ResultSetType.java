@@ -18,11 +18,25 @@ package org.apache.ibatis.mapping;
 import java.sql.ResultSet;
 
 /**
+ *
  * @author Clinton Begin
  */
 public enum ResultSetType {
+  /**
+   * 不滚动结果集
+   */
   FORWARD_ONLY(ResultSet.TYPE_FORWARD_ONLY),
+
+  /**
+   * insensitive：麻木不仁的，迟钝的
+   * 滚动结果集，但结果集不会随数据库变化
+   */
   SCROLL_INSENSITIVE(ResultSet.TYPE_SCROLL_INSENSITIVE),
+
+  /**
+   * sensitive：敏感的
+   * 滚动结果集，结果集随数据库变化而变化
+   */
   SCROLL_SENSITIVE(ResultSet.TYPE_SCROLL_SENSITIVE);
 
   private final int value;

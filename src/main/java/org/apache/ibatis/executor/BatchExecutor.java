@@ -62,7 +62,7 @@ public class BatchExecutor extends BaseExecutor {
       int last = statementList.size() - 1;
       stmt = statementList.get(last);
       applyTransactionTimeout(stmt);
-     handler.parameterize(stmt);//fix Issues 322
+      handler.parameterize(stmt);//fix Issues 322
       BatchResult batchResult = batchResultList.get(last);
       batchResult.addParameterObject(parameterObject);
     } else {
@@ -107,10 +107,17 @@ public class BatchExecutor extends BaseExecutor {
     return handler.<E>queryCursor(stmt);
   }
 
+  /**
+   * 真正的执行sql
+   * @param isRollback
+   * @return
+   * @throws SQLException
+   */
   @Override
   public List<BatchResult> doFlushStatements(boolean isRollback) throws SQLException {
     try {
       List<BatchResult> results = new ArrayList<BatchResult>();
+      // 如果需要回滚那就不执行sql
       if (isRollback) {
         return Collections.emptyList();
       }
@@ -151,6 +158,7 @@ public class BatchExecutor extends BaseExecutor {
       }
       return results;
     } finally {
+      // 关闭statement
       for (Statement stmt : statementList) {
         closeStatement(stmt);
       }

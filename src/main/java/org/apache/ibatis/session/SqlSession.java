@@ -244,6 +244,7 @@ public interface SqlSession extends Closeable {
   void rollback(boolean force);
 
   /**
+   * 刷新批处理语句
    * Flushes batch statements.
    * @return BatchResult list of updated records
    * @since 3.0.6
