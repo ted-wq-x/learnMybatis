@@ -26,8 +26,11 @@ public class PoolState {
 
   protected PooledDataSource dataSource;
 
+  // 两个比较重要的list
+  // idle：空闲
   protected final List<PooledConnection> idleConnections = new ArrayList<PooledConnection>();
   protected final List<PooledConnection> activeConnections = new ArrayList<PooledConnection>();
+
   protected long requestCount = 0;
   protected long accumulatedRequestTime = 0;
   protected long accumulatedCheckoutTime = 0;
@@ -112,5 +115,6 @@ public class PoolState {
     builder.append("\n===============================================================");
     return builder.toString();
   }
+
 
 }

@@ -43,6 +43,7 @@ public class UnpooledDataSourceFactory implements DataSourceFactory {
     //存放driver开头的属性
     Properties driverProperties = new Properties();
 
+    // 通过反射设置dataSource属性
     MetaObject metaDataSource = SystemMetaObject.forObject(dataSource);
     for (Object key : properties.keySet()) {
       String propertyName = (String) key;

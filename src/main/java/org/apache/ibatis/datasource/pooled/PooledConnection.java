@@ -236,9 +236,11 @@ class PooledConnection implements InvocationHandler {
   public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
     String methodName = method.getName();
     if (CLOSE.hashCode() == methodName.hashCode() && CLOSE.equals(methodName)) {
+      // 当调用jdbc的close方法时，将当前的代理connection放到池子中
       dataSource.pushConnection(this);
       return null;
     } else {
+      // 执行jdbc的connection方法调用
       try {
         if (!Object.class.equals(method.getDeclaringClass())) {
           // issue #579 toString() should never fail

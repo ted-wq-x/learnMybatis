@@ -141,6 +141,32 @@ ReuseExecutor在prepareStatement()阶段，判断缓存中是否命中。需要�
 ，这个类类似于工具类。
 
 
+## 日志
+
+mybatis为了支持常见的日志实现方式，自定义了Log接口，然后使用门面模式对不同的实现进行包装，并在LogFactory中使用反射的方式按一定的优先级进行构造。
+
+## 数据库连接池
+
+![](pic/DataSourceFactory.png)
+
+1. JndiDataSourceFactory：该数据源使用JNDI获取数据源，例如和tomcat配合使用（感觉很少使用），tomcat中集成了DBCP连接池。
+2. UnpooledDataSourceFactory：就是原生的jdbc的内容。这个类处理了xml配置中的属性。
+3. PooledDataSourceFactory：内部使用的是UnpooledDataSource，但是使用jdk的动态代理包装了jdbc的connection(PooledConnection)，这样在
+调用connection的close方法就不会真的关闭链接了。*不推荐使用，效率很低。*
+
+下面注重看下PooledDataSource：
+
+预备指数
+1. PoolState：该类的所有方法都是synchronized，该类的主要作用是维护两个List<PooledConnection>，以及相关配置属性和池的状态，如平均等待时间，请求次数啊等等。
+2. PooledConnection：作为connection的代理类，实现InvocationHandler接口，在调用jdbc的close方法时，将代理的connection，push到连接池当中。 
+
+这个类主要看三个方法（笔记看源码）：
+
+1. pingConnection：检测连接是否合法
+2. popConnection： 从池中获取连接
+3. pushConnection：将连接放到池中
+4. forceCloseAll：关闭所有的链接
+
 ## JDBC相关知识
 
 在使用jdbc的connection.createStatement()时，有两个参数ResultSetType和ResultSet。
@@ -166,6 +192,6 @@ con.createStatement(int,int)：<br>
 ## 问题
 
 1. 三个不同的executor，分别在什么场景下使用？
-
-
+2. 为什么UnpooledDataSource中使用ConcurrentHashMap？(我感觉不需要)
+3. 为什么在PooledDataSource中popConnection方法，synchronized在while循环里面？
 

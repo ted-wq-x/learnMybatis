@@ -23,6 +23,10 @@ import javax.sql.DataSource;
  */
 public interface DataSourceFactory {
 
+  /**
+   * 从配置中获取数据库的属性
+   * @param props
+   */
   void setProperties(Properties props);
 
   DataSource getDataSource();

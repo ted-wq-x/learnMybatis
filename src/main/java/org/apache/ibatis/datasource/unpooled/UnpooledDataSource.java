@@ -51,6 +51,7 @@ public class UnpooledDataSource implements DataSource {
 
   static {
 
+    // 通过spi获取连接驱动
     Enumeration<Driver> drivers = DriverManager.getDrivers();
     while (drivers.hasMoreElements()) {
       Driver driver = drivers.nextElement();
@@ -201,6 +202,7 @@ public class UnpooledDataSource implements DataSource {
     initializeDriver();
     //使用驱动进行连接，这有很大部分都是jdk的东西
     Connection connection = DriverManager.getConnection(url, properties);
+    //设置默认值
     configureConnection(connection);
     return connection;
   }
@@ -210,6 +212,7 @@ public class UnpooledDataSource implements DataSource {
    * @throws SQLException
    */
   private synchronized void initializeDriver() throws SQLException {
+    // 如果spi没有找到驱动，再通过类加载器去找
     if (!registeredDrivers.containsKey(driver)) {
       Class<?> driverType;
       try {

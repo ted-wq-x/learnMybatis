@@ -19,8 +19,49 @@ import java.util.concurrent.atomic.AtomicInteger;
  * 创建时间：  2018/3/7 0007 16:28
  */
 public class Main {
+
     @Test
-    public void test1(){
+    public void testInterruption(){
+        Object object = new Object();
+
+        Thread thread = new Thread(() -> {
+
+            try {
+
+                synchronized (object) {
+                    System.out.println("sleep");
+
+                    object.wait();
+                    System.out.println("wait");
+                }
+
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
+        });
+        thread.start();
+
+        thread.interrupt();
+        new Thread(() -> {
+            synchronized (object) {
+
+                System.out.println("come on");
+                object.notifyAll();
+            }
+        }).start();
+
+
+        try {
+            Thread.sleep(2000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    @Test
+    public void test1() {
         Dog dog = new Dog();
         Man man = dog::say;
         man.say();
@@ -28,7 +69,7 @@ public class Main {
 
 
     public static class Dog {
-         void say() {
+        void say() {
             System.out.println("w,w,w");
         }
     }
@@ -50,17 +91,17 @@ public class Main {
 
 
     @Test
-    public void testInstanceOf(){
+    public void testInstanceOf() {
         AtomicInteger integer = new AtomicInteger();
         CountDownLatch countDownLatch = new CountDownLatch(2);
-       new Thread(()->{
+        new Thread(() -> {
             for (int i = 0; i < 10; i++) {
                 integer.addAndGet(10);
             }
-           countDownLatch.countDown();
+            countDownLatch.countDown();
         }).start();
 
-        new Thread(()->{
+        new Thread(() -> {
             for (int i = 0; i < 10; i++) {
                 integer.addAndGet(1);
             }
@@ -82,14 +123,14 @@ public class Main {
         new Thread(() -> {
             try {
                 for (int i = 0; i < 10; i++) {
-                        Name.set(Thread.currentThread().getName() + ":" + i);
+                    Name.set(Thread.currentThread().getName() + ":" + i);
 
                     Thread.sleep(ThreadLocalRandom.current().nextInt(10) * 100);
                     System.out.println(Name.get());
                 }
             } catch (InterruptedException e) {
                 e.printStackTrace();
-            }finally {
+            } finally {
                 countDownLatch.countDown();
             }
         }).start();
@@ -104,7 +145,7 @@ public class Main {
                 }
             } catch (InterruptedException e) {
                 e.printStackTrace();
-            }finally {
+            } finally {
                 countDownLatch.countDown();
             }
         }).start();
@@ -113,15 +154,16 @@ public class Main {
     }
 
 
-   static class Name{
+    static class Name {
         private static final ThreadLocal<String> LOCAL = new ThreadLocal<>();
 
-        public static String get(){
+        public static String get() {
             return LOCAL.get();
         }
-       public static void set(String name){
-           LOCAL.set(name);
-       }
+
+        public static void set(String name) {
+            LOCAL.set(name);
+        }
 
     }
 
